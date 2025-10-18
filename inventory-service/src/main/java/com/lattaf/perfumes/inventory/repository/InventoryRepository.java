@@ -7,4 +7,6 @@ import java.util.Optional;
 
 public interface InventoryRepository extends JpaRepository<Inventory, Long> {
     boolean existsBySkuCodeAndQuantityGreaterThanEqual(String skuCode, Integer quantity);
+    Optional<Inventory> findById(Long id);
+    boolean existsById(Long id);
 }
