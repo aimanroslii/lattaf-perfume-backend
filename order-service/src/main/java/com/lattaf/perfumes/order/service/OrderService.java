@@ -1,7 +1,11 @@
 package com.lattaf.perfumes.order.service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.lattaf.perfumes.order.client.InventoryClient;
+import com.lattaf.perfumes.order.dto.OrderItem;
 import com.lattaf.perfumes.order.dto.OrderRequest;
+import com.lattaf.perfumes.order.dto.OrderResponse;
 import com.lattaf.perfumes.order.event.OrderPlacedEvent;
 import com.lattaf.perfumes.order.model.Order;
 import com.lattaf.perfumes.order.repository.OrderRepository;
@@ -11,6 +15,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.kafka.core.KafkaTemplate;
 
+import java.math.BigDecimal;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.UUID;
 
 @Service
@@ -23,38 +30,41 @@ public class OrderService {
     private final InventoryClient inventoryClient;
     private final KafkaTemplate<String, OrderPlacedEvent> kafkaTemplate;
 
-    public void placeOrder(OrderRequest orderRequest){
-        var isProductInStock = inventoryClient.isInStock(orderRequest.skuCode(), orderRequest.quantity());
+    public final ObjectMapper objectMapper = new ObjectMapper();
 
-        if(isProductInStock){
-            Order order = new Order();
-            order.setOrderNumber(UUID.randomUUID().toString());
-            order.setSkuCode(orderRequest.skuCode());
-            order.setPrice(orderRequest.price());
-            order.setQuantity(orderRequest.quantity());
-            orderRepository.save(order);
-            log.info("Order placed successfully with order number: {}", order.getOrderNumber());
+    public OrderResponse placeOrder(OrderRequest orderRequest) throws JsonProcessingException {
+        List<OrderItem> validateItems = new ArrayList<>();
+        Integer totalQuantity = 0;
+        BigDecimal totalPrice = BigDecimal.ZERO;
 
-            // Send the message to Kafka Topic
-            OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent();
-            orderPlacedEvent.setOrderNumber(order.getOrderNumber());
-            orderPlacedEvent.setEmail(orderRequest.userDetails().email());
-            orderPlacedEvent.setFirstName(orderRequest.userDetails().firstName());
-            orderPlacedEvent.setLastName(orderRequest.userDetails().lastName());
-            log.info("Start - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
-            kafkaTemplate.send("order-placed", orderPlacedEvent);
-            log.info("End - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
-        } else {
-            throw new RuntimeException("Product with SkuCode "+ orderRequest.skuCode()+ " is not in stock");
+        for(OrderItem item : orderRequest.items()) {
+            boolean inStock = inventoryClient.isInStock(item.skuCode(), item.quantity());
+            if(!inStock) {
+                throw new RuntimeException("Product with SkuCode " + item.skuCode() + " is not in stock");
+            }
+            validateItems.add(item);
+            totalQuantity += item.quantity();
+            totalPrice = totalPrice.add(item.price().multiply(BigDecimal.valueOf(item.quantity())));
         }
-    }
 
-    private static Order mapToOrder(OrderRequest orderRequest) {
         Order order = new Order();
         order.setOrderNumber(UUID.randomUUID().toString());
-        order.setPrice(orderRequest.price());
-        order.setQuantity(orderRequest.quantity());
-        order.setSkuCode(orderRequest.skuCode());
-        return order;
+        order.setSkuCode(objectMapper.writeValueAsString(validateItems));
+        order.setPrice(totalPrice);
+        order.setQuantity(totalQuantity);
+        orderRepository.save(order);
+        log.info("Order placed successfully with order number: {}", order.getOrderNumber());
+
+        //Send the message to kafka topic
+        OrderPlacedEvent orderPlacedEvent = new OrderPlacedEvent();
+        orderPlacedEvent.setOrderNumber(order.getOrderNumber());
+        orderPlacedEvent.setEmail(orderRequest.userDetails().email());
+        orderPlacedEvent.setFirstName(orderRequest.userDetails().firstName());
+        orderPlacedEvent.setLastName(orderRequest.userDetails().lastName());
+        log.info("Start - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
+        kafkaTemplate.send("order-placed", orderPlacedEvent);
+        log.info("End - Sending OrderPlacedEvent {} to Kafka topic order-placed", orderPlacedEvent);
+
+        return new OrderResponse("Order placed successfully");
     }
 }

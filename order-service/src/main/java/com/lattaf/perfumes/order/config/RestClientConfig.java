@@ -22,6 +22,10 @@ public class RestClientConfig {
 
     @Value("${inventory.service.url}")
     private String inventoryServiceUrl;
+
+//    @Value("${product.service.url}")
+//    private String productServiceUrl;
+
     private final ObservationRegistry observationRegistry;
 
     @Bean

@@ -1,5 +1,6 @@
 package com.lattaf.perfumes.order.model;
 
+import com.lattaf.perfumes.order.dto.OrderItem;
 import jakarta.persistence.*;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
@@ -7,6 +8,7 @@ import lombok.NoArgsConstructor;
 import lombok.Setter;
 
 import java.math.BigDecimal;
+import java.util.List;
 
 @Entity
 @Table(name = "t_orders")
