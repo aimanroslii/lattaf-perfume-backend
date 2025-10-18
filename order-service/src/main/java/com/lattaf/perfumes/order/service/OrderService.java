@@ -67,4 +67,33 @@ public class OrderService {
 
         return new OrderResponse("Order placed successfully");
     }
+
+    @Transactional
+    public Order getOrderById(Long id) {
+        Order order = orderRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Order not found"));
+
+        log.info("Order retrieved successfully for id:{}", order.getId());
+        return order;
+    }
+
+    @Transactional
+    public Order getOrderByOrderNumber(String orderNumber) {
+        Order order = orderRepository.findByOrderNumber(orderNumber)
+                .orElseThrow(() -> new RuntimeException("Order number not found"));
+
+        log.info("Order number retrieved successfully for id:{} ", order.getOrderNumber());
+        return order;
+    }
+
+    @Transactional
+    public void deleteOrder(Long id){
+        boolean exists = orderRepository.existsById(id);
+        if(!exists) {
+            throw new RuntimeException("Order not found");
+        }
+
+        orderRepository.deleteById(id);
+        log.info("Order deleted successfully, id={}", id);
+    }
 }

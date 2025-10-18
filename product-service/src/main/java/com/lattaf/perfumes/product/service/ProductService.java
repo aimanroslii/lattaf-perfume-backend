@@ -119,13 +119,13 @@ public class ProductService {
 
     @Transactional
     public void deleteProduct(String id) {
-        boolean exits = productRepository.existsById(id);
-        if(!exits) {
+        boolean exists = productRepository.existsById(id);
+        if(!exists) {
             throw new RuntimeException("Product not found with id: " + id);
         }
 
         productRepository.deleteById(id);
-        log.info("Product deleted successfully : id={}", id);
+        log.info("Product deleted successfully, id={}", id);
     }
 
 }
