@@ -24,6 +24,7 @@ flexibility in deployment and scaling.
 - Secure authentication and authorization using OAuth2
 - Synchronous and asynchronous communication between services
 - Event-driven notifications through Kafka
+- Database migration via Flyway
 - Caching layer for improved performance and reduced latency
 - Centralized logging and monitoring for observability and debugging
 - Containerized deployment with Docker and Kubernetes
