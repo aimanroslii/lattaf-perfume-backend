@@ -29,6 +29,9 @@ flexibility in deployment and scaling.
 - Containerized deployment with Docker and Kubernetes
 
 ## 🧩 Architecture
+
+<img width="1897" height="1070" alt="Lattaf Perfume Microservices Architecture" src="https://github.com/user-attachments/assets/7825ec02-ffb7-4a4a-8fcd-75d10b4f5090" />
+
 The client communicates with the system through the API Gateway, which routes requests to different microservices and interacts with the Authentication Server (Kinde) for secure access control.
 
 - The Product Service manages product details and stores data in MongoDB.
@@ -49,10 +52,15 @@ The client communicates with the system through the API Gateway, which routes re
 
 - Product Service API
 
+<img width="1319" height="809" alt="product service swagger" src="https://github.com/user-attachments/assets/46bb0b57-330c-405b-84ff-8d1ee848fbff" />
+
 - Order Service API
+
+<img width="1390" height="808" alt="order service swagger" src="https://github.com/user-attachments/assets/903e2a2e-2975-4be5-a3eb-d84ffa43e3d3" />
 
 - Inventory Service API
 
+<img width="1335" height="749" alt="inventory service swagger" src="https://github.com/user-attachments/assets/0c448d77-c219-4908-84d7-c6e01dc87101" />
 
 ## 💭 How can it be improved?
 
