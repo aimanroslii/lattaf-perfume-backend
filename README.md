@@ -1,4 +1,112 @@
-## Video
+# 🌸💨 Lattaf Perfume Backend
+
+Lataf Perfume Backend is a modern e-commerce backend system built with 
+a scalable and resilient microservices design. The architecture is designed to handle product management, order processing, inventory and notifications 
+efficiently while ensuring high availability, observability, and secure communication across services.
+The system is containerized with Docker and orchestrated via Kubernetes, ensuring
+flexibility in deployment and scaling.
+
+## 🧰 Technologies
+
+- **Backend Framework** - Java 17m Spring Boot 3, Spring Cloud
+- **Authenication** - Kinde (OAuth2, OpenID Connect)
+- **Databases** - MySQL, MongoDB
+- **Caching** - Redis
+- **Message Broker** - Apache Kafka
+- **Service Discovery** - Eureka
+- **Containerization & Orchestration** - Docker, Kubernetes
+- **Observability && Monitoring** - Prometheus, Grafana, Loki, Tempo, OpenTelemetry
+- **API Gateway** - Spring Cloud Gateway
+
+## 🦄 Features
+
+- Modular microservice-based architecture for scalability and maintainability
+- Secure authentication and authorization using OAuth2
+- Synchronous and asynchronous communication between services
+- Event-driven notifications through Kafka
+- Caching layer for improved performance and reduced latency
+- Centralized logging and monitoring for observability and debugging
+- Containerized deployment with Docker and Kubernetes
+
+## 🧩 Architecture
+The client communicates with the system through the API Gateway, which routes requests to different microservices and interacts with the Authentication Server (Kinde) for secure access control.
+
+- The Product Service manages product details and stores data in MongoDB.
+
+- The Order Service, backed by MySQL and Redis caching, handles order placement and communication with other services.
+
+- The Inventory Service synchronizes product stock levels through synchronous communication with the order service.
+
+- The Notification Service listens for events through Apache Kafka for asynchronous communication, sending notifications after successful transactions.
+
+- Eureka Server provides service discovery to enable dynamic scaling and interaction among microservices.
+
+- Prometheus, Grafana, Grafana Loki, Grafana Tempo, and OpenTelemetry provide observability, monitoring, and distributed tracing across the system.
+
+- Circuit Breaker patterns are implemented to ensure fault tolerance and prevent cascading failures across services.
+
+## 🌟 Services & Endpoints
+
+- Product Service API
+
+- Order Service API
+
+- Inventory Service API
+
+
+## 💭 How can it be improved?
+
+- Host all microservices on a managed cloud platform like AWS, Azure or GCP using Kubernetes
+- Integrate Spring Cloud Config or Vault to securely manage environment-specific configurations and credentials in the cloud
+- Implement Github Actions or Jenkins pipelines for automated cloud deployments.
+
+## 🍿 Video
+
+#### 🧭 System Flow Overview, Product to Order Lifecycle
+
+The following flow demonstrates how the Lattaf Perfume Microservices Architecture handles product creation, inventory synchronization, and customer ordering from end to end:
+
+#### 🧱 Product Creation
+
+- The admin or backend system sends a `POST /api/product request` to the Product Service to create a new product.
+
+- The product information (name, price, description, etc.) is stored in MongoDB.
+
+#### 📦 Inventory Synchronization
+
+- Once the product is successfully created, a `POST /api/inventory` request is triggered automatically or manually to register the initial stock level in the Inventory Service.
+
+- The inventory data is stored in MySQL, ensuring stock levels are tracked per product.
+
+#### 🏠 Display on Homepage (Featured Products)
+
+- The Frontend (Next.js) calls `GET /api/product/featured` to fetch and display featured products on the homepage.
+
+- The response comes from the Product Service, showing items available for users to browse.
+
+#### 🛍️ Product Detail View
+
+- When a customer navigates to a specific product page, the frontend sends `GET /api/product/{id}`.
+
+- The Product Service returns full details (name, price, description, etc.) for that specific product.
+
+#### 🧠 Cart and Inventory Cache
+
+- When the product is added to the cart, the system retrieves the latest stock level from the Inventory Service `GET /api/inventory/{id}` to ensure accurate availability.
+
+- The inventory data is then temporarily stored in Redis for faster access and reduced database load during the checkout process.
+
+#### 💳 Order Submission
+
+- When the customer proceeds to checkout, the frontend sends `POST /api/order` to the Order Service, including the product IDs, quantities, and user details.
+
+- The Order Service validates stock availability via Redis and the Inventory Service.
+
+- After successful validation, the order details are stored in MySQL. The Inventory Service updates the remaining stock. A message is published to Apache Kafka for asynchronous communication with the Notification Service.
+
+#### 📧 Notification Handling
+
+- The Notification Service listens to Kafka events and sends an email or confirmation message to the customer once the order is successfully placed.
 
 https://github.com/user-attachments/assets/4b556f82-412c-467d-9da2-2def413b692e
 
